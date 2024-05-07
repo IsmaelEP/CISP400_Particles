@@ -1,128 +1,140 @@
 #include "Matrices.h"
 
+
 namespace Matrices
 {
+    Matrix::Matrix(int _rows, int _cols)
+    {
+        a.resize(_rows, { 0 });
+        for (int i = 0; i < a.size(); i++)
+        {
+            a.at(i).resize(_cols, 0);
+        }
+        rows = _rows;
+        cols = _cols;
+    }
 
-	Matrix::Matrix(int _rows, int _cols)
-	{
-		rows = _rows;
-		cols = _cols;
-		
-		a.resize(rows);
-		
-		for(int i = 0; i < rows; i++)
-		{
-			a[i].resize(cols,0);
-		}
+    ///Add each corresponding element.
+    ///usage:  c = a + b;
+    Matrix operator+(const Matrix& a, const Matrix& b)
+    {
+        if (a.getCols() == b.getCols() && a.getRows() == b.getRows())
+        {
+            Matrix c(a.getRows(), a.getCols());
+            for (int i = 0; i < a.getRows(); i++)
+            {
+                for (int j = 0; j < a.getCols(); j++)
+                {
+                    c(i, j) = a(i, j) + b(i, j);
+                }
+            }
+            return c;
+        }
+        else
+        {
+            throw runtime_error("Error: dimensions must agree");
+        }
 
+    }
 
-		
-	}
+    ///Matrix multiply.  See description.
+    ///usage:  c = a * b;
+    Matrix operator*(const Matrix& a, const Matrix& b)
+    {
+        if (a.getCols() == b.getRows())
+        {
+            Matrix c(a.getRows(), b.getCols());
+            for (int i = 0; i < a.getRows(); i++)
+            {
+                for (int k = 0; k < b.getCols(); k++)
+                {
+                    for (int j = 0; j < a.getCols(); j++)
+                    {
+                        c(i, k) += a(i, j) * b(j, k);
+                    }
+                }
+            }
+            return c;
+        }
+        else
+        {
+            throw runtime_error("Error: dimensions must agree");
+        }
 
-	
+    }
 
+    ///Matrix comparison.  See description.
+    ///usage:  a == b
+    bool operator==(const Matrix& a, const Matrix& b)
+    {
+        if (a.getCols() == b.getCols() && a.getRows() == b.getRows())
+        {
+            for (int i = 0; i < a.getRows(); i++)
+            {
+                for (int j = 0; j < a.getCols(); j++)
+                {
+                    if (a(i, j) != b(i, j))
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 
+    ///Matrix comparison.  See description.
+    ///usage:  a != b
+    bool operator!=(const Matrix& a, const Matrix& b)
+    {
+        return !(a == b);
+    }
 
-	Matrix operator+(const Matrix& a, const Matrix& b)
-	{
-		int aRows = a.getRows();
-		int aCols = a.getCols();
-		int bRows = b.getRows();
-		int bCols = b.getCols();
+    ///Output matrix.
+    ///Separate columns by ' ' and rows by '\n'
+    ostream& operator<<(ostream& os, const Matrix& a)
+    {
+        for (int i = 0; i < a.getRows(); i++)
+        {
+            for (int j = 0; j < a.getCols(); j++)
+            {
+                os << a(i, j) << ' ';
+            }
+            os << '\n';
+        }
+        return os;
 
-		if (aRows != bRows || aCols != bCols) {
-			throw std::invalid_argument("Matrix dimensions are not compatible for addition");
-		}
-
-		Matrix result(aRows, aCols);
-
-		for (int i = 0; i < aRows; ++i) {
-			for (int j = 0; j < aCols; ++j) {
-				result(i, j) = a(i, j) + b(i, j);
-			}
-		}
-
-		return result;
-	}
-
-	Matrix operator*(const Matrix& a, const Matrix& b)
-	{
-		int aRows = a.getRows();
-		int aCols = a.getCols();
-		int bRows = b.getRows();
-		int bCols = b.getCols();
-
-		if (aCols != bRows) {
-			throw invalid_argument("Error: dimensions must agree");
-		}
-
-		Matrix result(aRows, bCols);  
-
-		for (int i = 0; i < aRows; ++i) {
-			for (int j = 0; j < bCols; ++j) {
-				double sum = 0.0;
-				for (int k = 0; k < aCols; ++k) {
-					sum += a(i, k) * b(k, j);
-				}
-				result(i, j) = sum;
-			}
-		}
-
-		return result;
-	}
-
-
-	ostream& operator<<(ostream& os, const Matrix& a)
-	{
-		for (int i = 0; i < a.getRows(); i++) 
-		{
-			for (int j = 0; j < a.getCols(); j++) 
-			{
-				os << setw(10) << a(i, j) << setw(10);
-			}
-			os << "\n\n";
-		}
-		return os;
-	}
-
-	bool operator==(const Matrix& a, const Matrix& b)
-	{
-		int curcols = a.getCols();
-		int currows = a.getRows();
-
-		if (b.getCols() != curcols || b.getRows() != currows)
-		{
-			return false;
-		}
-
-
-		for (int i = 0; i < curcols; i++)
-		{
-			for (int j = 0; j < currows; j++)
-			{
-				if (abs(a(j, i) - b(j, i)) > 0.001)
-				{
-					return false;
-				}
-			}
-		}
-
-		return true;
-	}
-
-	bool operator!=(const Matrix& a, const Matrix& b)
-	{
-		if (a == b)
-		{
-			return false;
-		}
-		else
-		{
-			return true;
-		}
-	}
+    }
 
 
+    RotationMatrix::RotationMatrix(double theta) : Matrix(2,2)
+    {
+        a.at(0).at(0) = cos(theta);
+        a.at(1).at(0) = sin(theta);
+        a.at(0).at(1) = -sin(theta);
+        a.at(1).at(1) = cos(theta);
+    }
+
+    ScalingMatrix::ScalingMatrix(double scale) : Matrix(2, 2)
+    {
+        a.at(0).at(0) = scale;
+        a.at(1).at(0) = 0;
+        a.at(0).at(1) = 0;
+        a.at(1).at(1) = scale;
+    }
+
+    TranslationMatrix::TranslationMatrix(double xShift, double yShift, int nCols) : Matrix(2,nCols)
+    {
+        for (int i = 0; i < nCols; i++)
+        {
+            a.at(0).at(i) = xShift;
+            a.at(1).at(i) = yShift;
+        }
+    }
 
 
 }
