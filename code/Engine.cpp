@@ -2,8 +2,8 @@
 
 Engine::Engine()
 {
-	int pixelWidth = VideoMode::getDesktopMode().width / 2;
-	int pixelHeight = VideoMode::getDesktopMode().height / 2;
+	int pixelWidth = VideoMode::getDesktopMode().width;
+	int pixelHeight = VideoMode::getDesktopMode().height;
 	VideoMode vm(pixelWidth, pixelHeight);
 
 	m_Window.create(vm, "Particle", Style::Default);
@@ -21,12 +21,13 @@ void Engine::run()
 	while (m_Window.isOpen())
 	{
 		// check all the window's events that were triggered since the last iteration of the loop
-		clock.restart();
-		sf::Time s = clock.getElapsedTime();
+		
+		sf::Time s = clock.restart();// clock.getElapsedTime();
 		float seconds = s.asSeconds();
 		input();
 		update(seconds);
 		draw();
+		;
 	}
 
 }
@@ -51,6 +52,7 @@ void Engine::input()
 			{
 				
 				Particle part(m_Window, rand() % 25 + 50, position);
+				m_particles.push_back(part);
 			}
 
 
@@ -93,7 +95,6 @@ void Engine::draw()
 	for (int i = 0; i < m_particles.size(); i++)
 	{
 		m_Window.draw(m_particles.at(i));
-
 	}
 
 	m_Window.display();
