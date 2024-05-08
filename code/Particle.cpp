@@ -15,8 +15,12 @@ Particle::Particle(RenderTarget& target, int numPoints, Vector2i mouseClickPosit
     m_vy = (rand() % 401 + 100);
     if (rand() % 2)  m_vx *= -1;
     if (rand() % 2)  m_vy *= -1; 
-    m_color1 = Color::White;
-    m_color2 = Color::Red;
+    sf::Color RandColor1(rand() % 250, rand() % 250, rand() % 250);
+   
+
+    m_color1 = sf::Color::White;
+    m_color2 = RandColor1;
+
     double theta = ((float)rand() / (RAND_MAX)) * M_PI / 2;
     double dTheta = 2 * M_PI / (numPoints - 1);
     for (int j = 0; j < m_numPoints; j++)
